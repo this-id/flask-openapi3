@@ -3,7 +3,7 @@
 # @Time    : 2022/8/30 9:40
 import inspect
 from functools import wraps
-from typing import Callable, List, Optional, Dict, Any
+from typing import Callable, Optional, Any
 
 from flask.wrappers import Response as FlaskResponse
 
@@ -22,16 +22,16 @@ class APIScaffold:
             rule: str,
             func: Callable,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True,
             method: str = HTTPMethod.GET
     ) -> ParametersTuple:
@@ -126,16 +126,16 @@ class APIScaffold:
             self,
             rule: str,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True,
             **options: Any
     ) -> Callable:
@@ -189,16 +189,16 @@ class APIScaffold:
             self,
             rule: str,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True,
             **options: Any
     ) -> Callable:
@@ -252,16 +252,16 @@ class APIScaffold:
             self,
             rule: str,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True,
             **options: Any
     ) -> Callable:
@@ -315,16 +315,16 @@ class APIScaffold:
             self,
             rule: str,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True,
             **options: Any
     ) -> Callable:
@@ -378,16 +378,16 @@ class APIScaffold:
             self,
             rule: str,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True,
             **options: Any
     ) -> Callable:

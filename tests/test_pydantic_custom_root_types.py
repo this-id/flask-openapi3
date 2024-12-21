@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2022/2/27 16:53
-from typing import List, Dict, Any
+from typing import Any
 
 import pytest
 from pydantic import BaseModel, RootModel
@@ -18,15 +18,15 @@ class Sellout(BaseModel):
 
 
 class SelloutList(RootModel):
-    root: List[Sellout]
+    root: list[Sellout]
 
 
 class SelloutDict(RootModel):
-    root: Dict[str, Sellout]
+    root: dict[str, Sellout]
 
 
 class SelloutDict2(RootModel):
-    root: Dict[Any, Any]
+    root: dict[Any, Any]
 
 
 class SelloutDict3(BaseModel):

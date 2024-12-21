@@ -2,7 +2,7 @@
 # @Author  : llc
 # @Time    : 2021/4/28 11:24
 from http import HTTPStatus
-from typing import Optional, List
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -66,7 +66,7 @@ class BookPath(BaseModel):
 
 class BookQuery(BaseModel):
     age: Optional[int] = Field(None, description='Age')
-    s_list: List[str] = Field(None, alias='s_list[]', description='some array')
+    s_list: list[str] = Field(None, alias='s_list[]', description='some array')
 
 
 class BookBody(BaseModel):

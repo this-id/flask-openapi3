@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2024/9/29 10:36
-from typing import List
-
 import pytest
 from pydantic import BaseModel
 
@@ -20,11 +18,11 @@ def client():
 
 
 class BookQuery(BaseModel):
-    age: List[int] = [1, 2]
+    age: list[int] = [1, 2]
 
 
 class BookForm(BaseModel):
-    age: List[float] = [3, 4]
+    age: list[float] = [3, 4]
 
 
 @app.get("/query")

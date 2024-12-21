@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Generic, TypeVar, List, Optional, Tuple, Literal
+from typing import Generic, TypeVar, Optional, Literal
 
 from pydantic import BaseModel, Field
 
@@ -363,7 +363,7 @@ class GenericResponse(BaseModel, Generic[T]):
 
 
 class ListGenericResponse(BaseModel, Generic[T]):
-    items: List[GenericResponse[T]]
+    items: list[GenericResponse[T]]
 
 
 def test_responses_with_generics(request):
@@ -546,7 +546,7 @@ def test_deprecated_none(request):
 
 
 class TupleModel(BaseModel):
-    my_tuple: Tuple[Literal["a", "b"], Literal["c", "d"]]
+    my_tuple: tuple[Literal["a", "b"], Literal["c", "d"]]
 
 
 def test_prefix_items(request):

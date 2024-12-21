@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2021/5/11 14:03
-
-from typing import List
-
 from pydantic import BaseModel, Field
 
 from flask_openapi3 import OpenAPI, FileStorage
@@ -17,9 +14,9 @@ class UploadFileForm(BaseModel):
 
 
 class UploadFilesForm(BaseModel):
-    files: List[FileStorage]
-    str_list: List[str]
-    int_list: List[int]
+    files: list[FileStorage]
+    str_list: list[str]
+    int_list: list[int]
 
 
 @app.post('/upload/file')

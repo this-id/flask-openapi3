@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/4 9:36
-from typing import Dict, Optional, Union, Any
+from typing import Optional, Union, Any
 
 from pydantic import BaseModel, Field
 
@@ -23,16 +23,16 @@ class Components(BaseModel):
     https://spec.openapis.org/oas/v3.1.0#components-object
     """
 
-    schemas: Optional[Dict[str, Union[Reference, Schema]]] = Field(None)
-    responses: Optional[Dict[str, Union[Response, Reference]]] = None
-    parameters: Optional[Dict[str, Union[Parameter, Reference]]] = None
-    examples: Optional[Dict[str, Union[Example, Reference]]] = None
-    requestBodies: Optional[Dict[str, Union[RequestBody, Reference]]] = None
-    headers: Optional[Dict[str, Union[Header, Reference]]] = None
-    securitySchemes: Optional[Dict[str, Union[SecurityScheme, Dict[str, Any]]]] = None
-    links: Optional[Dict[str, Union[Link, Reference]]] = None
-    callbacks: Optional[Dict[str, Union[Callback, Reference]]] = None
-    pathItems: Optional[Dict[str, Union[PathItem, Reference]]] = None
+    schemas: Optional[dict[str, Union[Reference, Schema]]] = Field(None)
+    responses: Optional[dict[str, Union[Response, Reference]]] = None
+    parameters: Optional[dict[str, Union[Parameter, Reference]]] = None
+    examples: Optional[dict[str, Union[Example, Reference]]] = None
+    requestBodies: Optional[dict[str, Union[RequestBody, Reference]]] = None
+    headers: Optional[dict[str, Union[Header, Reference]]] = None
+    securitySchemes: Optional[dict[str, Union[SecurityScheme, dict[str, Any]]]] = None
+    links: Optional[dict[str, Union[Link, Reference]]] = None
+    callbacks: Optional[dict[str, Union[Callback, Reference]]] = None
+    pathItems: Optional[dict[str, Union[PathItem, Reference]]] = None
 
     model_config = {
         "extra": "allow"

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/4 9:46
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -18,8 +18,8 @@ class MediaType(BaseModel):
 
     media_type_schema: Optional[Union[Reference, Schema]] = Field(default=None, alias="schema")
     example: Optional[Any] = None
-    examples: Optional[Dict[str, Union[Example, Reference]]] = None
-    encoding: Optional[Dict[str, Encoding]] = None
+    examples: Optional[dict[str, Union[Example, Reference]]] = None
+    encoding: Optional[dict[str, Encoding]] = None
 
     model_config = {
         "extra": "allow"

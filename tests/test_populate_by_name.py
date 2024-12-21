@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2024/8/31 15:35
-from typing import Sequence, List, Tuple
+from typing import Sequence
 
 import pytest
 from pydantic import BaseModel, Field
@@ -38,7 +38,7 @@ def get_book(query: BookQuery):
 class QueryModel(BaseModel):
     aliased_field: str = Field(alias="aliasedField")
 
-    aliased_list_field: List[str] = Field(alias="aliasedListField")
+    aliased_list_field: list[str] = Field(alias="aliasedListField")
 
 
 @app.get("/query-alias-test")
@@ -59,7 +59,7 @@ def get_book_header(header: HeaderModel):
 
 
 class TupleModel(BaseModel):
-    values: Tuple[int, int]
+    values: tuple[int, int]
     sequence: Sequence[int] = Field(alias="Sequence")
 
     model_config = {"populate_by_name": True}

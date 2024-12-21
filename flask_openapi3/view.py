@@ -2,7 +2,7 @@
 # @Author  : llc
 # @Time    : 2022/10/14 16:09
 import typing
-from typing import Optional, List, Dict, Any, Callable
+from typing import Optional, Any, Callable
 
 from .models import ExternalDocumentation
 from .models import Server
@@ -26,8 +26,8 @@ class APIView:
     def __init__(
             self,
             url_prefix: Optional[str] = None,
-            view_tags: Optional[List[Tag]] = None,
-            view_security: Optional[List[Dict[str, List[str]]]] = None,
+            view_tags: Optional[list[Tag]] = None,
+            view_security: Optional[list[dict[str, list[str]]]] = None,
             view_responses: Optional[ResponseDict] = None,
             doc_ui: bool = True,
             operation_id_callback: Callable = get_operation_id_for_path,
@@ -55,11 +55,11 @@ class APIView:
         self.doc_ui = doc_ui
         self.operation_id_callback: Callable = operation_id_callback
 
-        self.views: Dict = dict()
-        self.paths: Dict = dict()
-        self.components_schemas: Dict = dict()
-        self.tags: List[Tag] = []
-        self.tag_names: List[str] = []
+        self.views: dict = dict()
+        self.paths: dict = dict()
+        self.components_schemas: dict = dict()
+        self.tags: list[Tag] = []
+        self.tag_names: list[str] = []
 
     def route(self, rule: str):
         """Decorator for view class"""
@@ -102,16 +102,16 @@ class APIView:
     def doc(
             self,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True
     ) -> Callable:
         """
@@ -190,7 +190,7 @@ class APIView:
 
         return decorator
 
-    def register(self, app: "OpenAPI", view_kwargs: Optional[Dict[Any, Any]] = None) -> None:
+    def register(self, app: "OpenAPI", view_kwargs: Optional[dict[Any, Any]] = None) -> None:
         """
         Register the API views with the given OpenAPI app.
 

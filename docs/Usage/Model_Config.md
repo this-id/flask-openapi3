@@ -130,7 +130,7 @@ Sometimes you may not want to use aliases (such as in the responses model). In t
 ```python
 class MessageResponse(BaseModel):
     message: str = Field(..., description="The message")
-    metadata: Dict[str, str] = Field(alias="metadata_")
+    metadata: dict[str, str] = Field(alias="metadata_")
 
     model_config = dict(
         by_alias=False

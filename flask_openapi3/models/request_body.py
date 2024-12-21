@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/4 9:53
-from typing import Dict, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -14,7 +14,7 @@ class RequestBody(BaseModel):
     """
 
     description: Optional[str] = None
-    content: Dict[str, MediaType]
+    content: dict[str, MediaType]
     required: Optional[bool] = True
 
     model_config = {

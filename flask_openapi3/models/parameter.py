@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/4 9:49
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -28,8 +28,8 @@ class Parameter(BaseModel):
     allowReserved: Optional[bool] = None
     param_schema: Optional[Union[Reference, Schema]] = Field(default=None, alias="schema")
     example: Optional[Any] = None
-    examples: Optional[Dict[str, Union[Example, Reference]]] = None
-    content: Optional[Dict[str, MediaType]] = None
+    examples: Optional[dict[str, Union[Example, Reference]]] = None
+    content: Optional[dict[str, MediaType]] = None
 
     model_config = {
         "extra": "allow"

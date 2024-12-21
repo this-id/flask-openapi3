@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/6/30 10:12
-from typing import List, Dict
-
 import pytest
 from pydantic import BaseModel, Field
 
@@ -14,7 +12,7 @@ app.config["TESTING"] = True
 
 class UploadFilesForm(BaseModel):
     file: FileStorage
-    str_list: List[str]
+    str_list: list[str]
 
     model_config = dict(
         openapi_extra={
@@ -70,7 +68,7 @@ class BookBody(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str = Field(..., description="The message")
-    metadata: Dict[str, str] = Field(alias="metadata_")
+    metadata: dict[str, str] = Field(alias="metadata_")
 
     model_config = dict(
         by_alias=False,

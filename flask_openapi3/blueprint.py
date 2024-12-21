@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2022/4/1 16:54
-from typing import Optional, List, Dict, Any, Callable
+from typing import Optional, Any, Callable
 
 from flask import Blueprint
 
@@ -28,8 +28,8 @@ class APIBlueprint(APIScaffold, Blueprint):
             name: str,
             import_name: str,
             *,
-            abp_tags: Optional[List[Tag]] = None,
-            abp_security: Optional[List[Dict[str, List[str]]]] = None,
+            abp_tags: Optional[list[Tag]] = None,
+            abp_security: Optional[list[dict[str, list[str]]]] = None,
             abp_responses: Optional[ResponseDict] = None,
             doc_ui: bool = True,
             operation_id_callback: Callable = get_operation_id_for_path,
@@ -54,10 +54,10 @@ class APIBlueprint(APIScaffold, Blueprint):
         super(APIBlueprint, self).__init__(name, import_name, **kwargs)
 
         # Initialize instance variables
-        self.paths: Dict = dict()
-        self.components_schemas: Dict = dict()
-        self.tags: List[Tag] = []
-        self.tag_names: List[str] = []
+        self.paths: dict = dict()
+        self.components_schemas: dict = dict()
+        self.tags: list[Tag] = []
+        self.tag_names: list[str] = []
 
         # Set values from arguments or default values
         self.abp_tags = abp_tags or []
@@ -111,16 +111,16 @@ class APIBlueprint(APIScaffold, Blueprint):
             rule: str,
             func: Callable,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True,
             method: str = HTTPMethod.GET
     ) -> ParametersTuple:

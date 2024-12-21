@@ -2,7 +2,7 @@
 # @Author  : llc
 # @Time    : 2023/8/6 13:47
 from enum import Enum
-from typing import List, Union, Dict, Any
+from typing import Union, Any
 
 import pytest
 from pydantic import BaseModel
@@ -35,21 +35,21 @@ class FileType(int, Enum):
 
 class FormParameters(BaseModel):
     file: FileStorage
-    file_list: List[FileStorage]
+    file_list: list[FileStorage]
     file_type: FileType
     number: float
-    number_list: List[float]
+    number_list: list[float]
     boolean: bool
-    boolean_list: List[bool]
+    boolean_list: list[bool]
     digit: int
-    digit_list: List[int]
+    digit_list: list[int]
     string: str
-    string_list: List[str]
-    obj: Dict[Any, Any]
+    string_list: list[str]
+    obj: dict[Any, Any]
     parameter: MetadataParameter
-    parameter_dict: Dict[str, MetadataParameter]
-    parameter_list: List[MetadataParameter]
-    parameter_list_union: List[Union[bool, float, str, int, FileType, MetadataParameter]]
+    parameter_dict: dict[str, MetadataParameter]
+    parameter_list: list[MetadataParameter]
+    parameter_list_union: list[Union[bool, float, str, int, FileType, MetadataParameter]]
     parameter_union: Union[MetadataParameter, MetadataParameter2]
     union_all: Union[str, int, float, bool, FileType, MetadataParameter]
     none: None = None
@@ -57,7 +57,7 @@ class FormParameters(BaseModel):
 
 
 class FormParameter(BaseModel):
-    obj: Dict[Any, Any]
+    obj: dict[Any, Any]
 
     model_config = dict(
         openapi_extra={

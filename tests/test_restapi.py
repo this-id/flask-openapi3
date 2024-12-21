@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import json
 from http import HTTPStatus
-from typing import Optional, List
+from typing import Optional
 
 import pytest
 from flask import Response
@@ -73,15 +73,15 @@ class BaseResponse(BaseModel):
 
 
 class BookListResponseV1(BaseResponse):
-    data: List[BookBodyWithID] = Field(..., description="All the books")
+    data: list[BookBodyWithID] = Field(..., description="All the books")
 
 
 class BookListResponseV2(BaseModel):
-    books: List[BookBodyWithID] = Field(...)
+    books: list[BookBodyWithID] = Field(...)
 
 
 class BookListResponseV3(RootModel):
-    root: List[BookBodyWithID]
+    root: list[BookBodyWithID]
 
 
 class BookResponse(BaseModel):
