@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/21 10:32
-from typing import List
-
 import pytest
 from flask import make_response, current_app
 from pydantic import BaseModel, Field, ValidationError
@@ -20,7 +18,7 @@ class GenericTracebackError(BaseModel):
 class ValidationErrorModel(BaseModel):
     code: str
     message: str
-    more_info: List[GenericTracebackError] = Field(..., json_schema_extra={"example": [GenericTracebackError(
+    more_info: list[GenericTracebackError] = Field(..., json_schema_extra={"example": [GenericTracebackError(
         location="GenericError.py",
         line=1,
         method="GenericError",

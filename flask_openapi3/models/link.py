@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/4 9:45
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -15,7 +15,7 @@ class Link(BaseModel):
 
     operationRef: Optional[str] = None
     operationId: Optional[str] = None
-    parameters: Optional[Dict[str, Any]] = None
+    parameters: Optional[dict[str, Any]] = None
     requestBody: Optional[Any] = None
     description: Optional[str] = None
     server: Optional[Server] = None

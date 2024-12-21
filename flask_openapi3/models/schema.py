@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/4 9:55
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -31,16 +31,16 @@ class Schema(BaseModel):
     uniqueItems: Optional[bool] = None
     maxProperties: Optional[int] = Field(default=None, ge=0)
     minProperties: Optional[int] = Field(default=None, ge=0)
-    required: Optional[List[str]] = Field(default=None)
-    enum: Union[None, List[Any]] = Field(default=None)
+    required: Optional[list[str]] = Field(default=None)
+    enum: Union[None, list[Any]] = Field(default=None)
     type: Optional[DataType] = Field(default=None)
-    allOf: Optional[List[Union[Reference, "Schema"]]] = None
-    oneOf: Optional[List[Union[Reference, "Schema"]]] = None
-    anyOf: Optional[List[Union[Reference, "Schema"]]] = None
+    allOf: Optional[list[Union[Reference, "Schema"]]] = None
+    oneOf: Optional[list[Union[Reference, "Schema"]]] = None
+    anyOf: Optional[list[Union[Reference, "Schema"]]] = None
     schema_not: Optional[Union[Reference, "Schema"]] = Field(default=None, alias="not")
     items: Optional[Union[Reference, "Schema"]] = None
-    prefixItems: Optional[List[Union[Reference, "Schema"]]] = None
-    properties: Optional[Dict[str, Union[Reference, "Schema"]]] = None
+    properties: Optional[dict[str, Union[Reference, "Schema"]]] = None
+    prefixItems: Optional[list[Union[Reference, "Schema"]]] = None
     additionalProperties: Optional[Union[bool, Reference, "Schema"]] = None
     description: Optional[str] = None
     schema_format: Optional[str] = Field(default=None, alias="format")

@@ -2,7 +2,7 @@
 # @Author  : llc
 # @Time    : 2023/7/4 9:50
 import typing
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -29,8 +29,8 @@ class PathItem(BaseModel):
     head: Optional["Operation"] = None
     patch: Optional["Operation"] = None
     trace: Optional["Operation"] = None
-    servers: Optional[List[Server]] = None
-    parameters: Optional[List[Union[Parameter, Reference]]] = None
+    servers: Optional[list[Server]] = None
+    parameters: Optional[list[Union[Parameter, Reference]]] = None
 
     model_config = {
         "extra": "allow"

@@ -3,7 +3,7 @@
 # @Time    : 2022/4/1 16:54
 import json
 from json import JSONDecodeError
-from typing import Any, Type, Optional, Dict
+from typing import Any, Type, Optional
 
 from flask import request, current_app, abort
 from pydantic import ValidationError, BaseModel
@@ -154,8 +154,8 @@ def _validate_request(
         form: Optional[Type[BaseModel]] = None,
         body: Optional[Type[BaseModel]] = None,
         raw: Optional[Type[BaseModel]] = None,
-        path_kwargs: Optional[Dict[Any, Any]] = None
-) -> Dict:
+        path_kwargs: Optional[dict[Any, Any]] = None
+) -> dict:
     """
     Validate requests and responses.
 
@@ -169,14 +169,14 @@ def _validate_request(
         path_kwargs: Path parameters.
 
     Returns:
-        Dict: Request kwargs.
+        dict: Request kwargs.
 
     Raises:
         ValidationError: If validation fails.
     """
 
     # Dictionary to store func kwargs
-    func_kwargs: Dict = {}
+    func_kwargs: dict = {}
 
     try:
         # Validate header, cookie, path, and query parameters

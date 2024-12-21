@@ -3,7 +3,7 @@
 # @Time    : 2022/9/2 15:35
 from enum import Enum
 from functools import wraps
-from typing import List, Optional
+from typing import Optional
 
 import pytest
 from pydantic import BaseModel, Field
@@ -28,13 +28,13 @@ class TypeEnum(str, Enum):
 
 class BookForm(BaseModel):
     file: FileStorage
-    files: List[FileStorage]
+    files: list[FileStorage]
     string: str
-    string_list: List[str]
+    string_list: list[str]
 
 
 class BookQuery(BaseModel):
-    age: List[int]
+    age: list[int]
     book_type: Optional[TypeEnum] = None
 
 

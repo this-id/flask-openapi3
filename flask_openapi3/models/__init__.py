@@ -9,7 +9,7 @@ The type orders are according to the contents of the specification:
 https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#table-of-contents
 """
 
-from typing import Optional, List, Dict, Union
+from typing import Optional, Union
 
 from flask import Request
 from pydantic import BaseModel
@@ -57,13 +57,13 @@ class APISpec(BaseModel):
     """https://spec.openapis.org/oas/v3.1.0#openapi-object"""
     openapi: str
     info: Info
-    servers: Optional[List[Server]] = None
+    servers: Optional[list[Server]] = None
     paths: Paths
     components: Optional[Components] = None
-    security: Optional[List[SecurityRequirement]] = None
-    tags: Optional[List[Tag]] = None
+    security: Optional[list[SecurityRequirement]] = None
+    tags: Optional[list[Tag]] = None
     externalDocs: Optional[ExternalDocumentation] = None
-    webhooks: Optional[Dict[str, Union[PathItem, Reference]]] = None
+    webhooks: Optional[dict[str, Union[PathItem, Reference]]] = None
 
     model_config = {
         "extra": "allow"
@@ -80,13 +80,13 @@ class OAuthConfig(BaseModel):
     appName: Optional[str] = None
     scopeSeparator: Optional[str] = None
     scopes: Optional[str] = None
-    additionalQueryStringParams: Optional[Dict[str, str]] = None
+    additionalQueryStringParams: Optional[dict[str, str]] = None
     useBasicAuthenticationWithAccessCodeGrant: Optional[bool] = False
     usePkceWithAuthorizationCodeGrant: Optional[bool] = False
 
 
 class RawModel(Request):
-    mimetypes: List[str] = ["application/json"]
+    mimetypes: list[str] = ["application/json"]
 
 
 Encoding.model_rebuild()

@@ -7,7 +7,7 @@ import re
 import sys
 from enum import Enum
 from http import HTTPStatus
-from typing import get_type_hints, Dict, Type, Callable, List, Tuple, Optional, Any, DefaultDict
+from typing import get_type_hints, Type, Callable, Optional, Any, DefaultDict
 
 from flask import make_response, current_app
 from flask.wrappers import Response as FlaskResponse
@@ -54,7 +54,7 @@ def get_operation(
         func: Callable, *,
         summary: Optional[str] = None,
         description: Optional[str] = None,
-        openapi_extensions: Optional[Dict[str, Any]] = None,
+        openapi_extensions: Optional[dict[str, Any]] = None,
 ) -> Operation:
     """
     Return an Operation object with the specified summary and description.
@@ -131,11 +131,11 @@ def get_model_schema(model: Type[BaseModel], mode: JsonSchemaMode = "validation"
     return model.model_json_schema(by_alias=by_alias, ref_template=OPENAPI3_REF_TEMPLATE, mode=mode)
 
 
-def parse_header(header: Type[BaseModel]) -> Tuple[List[Parameter], dict]:
+def parse_header(header: Type[BaseModel]) -> tuple[list[Parameter], dict]:
     """Parses a header model and returns a list of parameters and component schemas."""
     schema = get_model_schema(header)
     parameters = []
-    components_schemas: Dict = dict()
+    components_schemas: dict = dict()
     properties = schema.get("properties", {})
 
     for name, value in properties.items():
@@ -164,11 +164,11 @@ def parse_header(header: Type[BaseModel]) -> Tuple[List[Parameter], dict]:
     return parameters, components_schemas
 
 
-def parse_cookie(cookie: Type[BaseModel]) -> Tuple[List[Parameter], dict]:
+def parse_cookie(cookie: Type[BaseModel]) -> tuple[list[Parameter], dict]:
     """Parses a cookie model and returns a list of parameters and component schemas."""
     schema = get_model_schema(cookie)
     parameters = []
-    components_schemas: Dict = dict()
+    components_schemas: dict = dict()
     properties = schema.get("properties", {})
 
     for name, value in properties.items():
@@ -197,11 +197,11 @@ def parse_cookie(cookie: Type[BaseModel]) -> Tuple[List[Parameter], dict]:
     return parameters, components_schemas
 
 
-def parse_path(path: Type[BaseModel]) -> Tuple[List[Parameter], dict]:
+def parse_path(path: Type[BaseModel]) -> tuple[list[Parameter], dict]:
     """Parses a path model and returns a list of parameters and component schemas."""
     schema = get_model_schema(path)
     parameters = []
-    components_schemas: Dict = dict()
+    components_schemas: dict = dict()
     properties = schema.get("properties", {})
 
     for name, value in properties.items():
@@ -230,11 +230,11 @@ def parse_path(path: Type[BaseModel]) -> Tuple[List[Parameter], dict]:
     return parameters, components_schemas
 
 
-def parse_query(query: Type[BaseModel]) -> Tuple[List[Parameter], dict]:
+def parse_query(query: Type[BaseModel]) -> tuple[list[Parameter], dict]:
     """Parses a query model and returns a list of parameters and component schemas."""
     schema = get_model_schema(query)
     parameters = []
-    components_schemas: Dict = dict()
+    components_schemas: dict = dict()
     properties = schema.get("properties", {})
 
     for name, value in properties.items():
@@ -265,7 +265,7 @@ def parse_query(query: Type[BaseModel]) -> Tuple[List[Parameter], dict]:
 
 def parse_form(
         form: Type[BaseModel],
-) -> Tuple[Dict[str, MediaType], dict]:
+) -> tuple[dict[str, MediaType], dict]:
     """Parses a form model and returns a list of parameters and component schemas."""
     schema = get_model_schema(form)
     components_schemas = dict()
@@ -298,7 +298,7 @@ def parse_form(
 
 def parse_body(
         body: Type[BaseModel],
-) -> Tuple[Dict[str, MediaType], dict]:
+) -> tuple[dict[str, MediaType], dict]:
     """Parses a body model and returns a list of parameters and component schemas."""
     schema = get_model_schema(body)
     components_schemas = dict()
@@ -379,9 +379,9 @@ def get_responses(
 
 
 def parse_and_store_tags(
-        new_tags: List[Tag],
-        old_tags: List[Tag],
-        old_tag_names: List[str],
+        new_tags: list[Tag],
+        old_tags: list[Tag],
+        old_tag_names: list[str],
         operation: Operation
 ) -> None:
     """
@@ -411,7 +411,7 @@ def parse_and_store_tags(
 def parse_parameters(
         func: Callable,
         *,
-        components_schemas: Optional[Dict] = None,
+        components_schemas: Optional[dict] = None,
         operation: Optional[Operation] = None,
         doc_ui: bool = True,
 ) -> ParametersTuple:
@@ -426,7 +426,7 @@ def parse_parameters(
         doc_ui: Flag indicating whether to return types for documentation UI (default: True).
 
     Returns:
-        Tuple[Type[BaseModel], Type[BaseModel], Type[BaseModel], Type[BaseModel], Type[BaseModel], Type[BaseModel]]:
+        tuple[Type[BaseModel], Type[BaseModel], Type[BaseModel], Type[BaseModel], Type[BaseModel], Type[BaseModel]]:
         The types for header, cookie, path, query, form, and body parameters respectively.
 
     """

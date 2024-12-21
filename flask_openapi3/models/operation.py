@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/4 9:48
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 from pydantic import BaseModel
 
@@ -20,19 +20,19 @@ class Operation(BaseModel):
     https://spec.openapis.org/oas/v3.1.0#operation-object
     """
 
-    tags: Optional[List[str]] = None
+    tags: Optional[list[str]] = None
     summary: Optional[str] = None
     description: Optional[str] = None
     externalDocs: Optional[ExternalDocumentation] = None
     operationId: Optional[str] = None
-    parameters: Optional[List[Parameter]] = None
+    parameters: Optional[list[Parameter]] = None
     requestBody: Optional[Union[RequestBody, Reference]] = None
-    responses: Optional[Dict[str, Response]] = None
-    callbacks: Optional[Dict[str, Callback]] = None
+    responses: Optional[dict[str, Response]] = None
+    callbacks: Optional[dict[str, Callback]] = None
 
     deprecated: Optional[bool] = False
-    security: Optional[List[SecurityRequirement]] = None
-    servers: Optional[List[Server]] = None
+    security: Optional[list[SecurityRequirement]] = None
+    servers: Optional[list[Server]] = None
 
     model_config = {
         "extra": "allow"

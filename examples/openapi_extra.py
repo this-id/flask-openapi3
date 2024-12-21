@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/6/1 15:04
-from typing import List
-
 from pydantic import BaseModel
 
 from flask_openapi3 import OpenAPI, FileStorage
@@ -12,7 +10,7 @@ app = OpenAPI(__name__)
 
 class UploadFilesForm(BaseModel):
     file: FileStorage
-    str_list: List[str]
+    str_list: list[str]
 
     model_config = dict(
         openapi_extra={

@@ -2,22 +2,22 @@
 # @Author  : llc
 # @Time    : 2023/7/9 15:25
 from http import HTTPStatus
-from typing import Dict, Union, Type, Any, Tuple, Optional
+from typing import Union, Type, Any, Optional
 
 from pydantic import BaseModel
 
 from .models import RawModel
 from .models import SecurityScheme
 
-_ResponseDictValue = Union[Type[BaseModel], Dict[Any, Any], None]
+_ResponseDictValue = Union[Type[BaseModel], dict[Any, Any], None]
 
-ResponseDict = Dict[Union[str, int, HTTPStatus], _ResponseDictValue]
+ResponseDict = dict[Union[str, int, HTTPStatus], _ResponseDictValue]
 
-ResponseStrKeyDict = Dict[str, _ResponseDictValue]
+ResponseStrKeyDict = dict[str, _ResponseDictValue]
 
-SecuritySchemesDict = Dict[str, Union[SecurityScheme, Dict[str, Any]]]
+SecuritySchemesDict = dict[str, Union[SecurityScheme, dict[str, Any]]]
 
-ParametersTuple = Tuple[
+ParametersTuple = tuple[
     Optional[Type[BaseModel]],
     Optional[Type[BaseModel]],
     Optional[Type[BaseModel]],

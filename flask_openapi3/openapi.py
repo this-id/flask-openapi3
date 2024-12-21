@@ -5,7 +5,7 @@ import os
 import re
 import sys
 from importlib import import_module
-from typing import Optional, List, Dict, Union, Any, Type, Callable
+from typing import Optional, Union, Any, Type, Callable
 
 from flask import Flask, Blueprint, render_template_string
 from pydantic import BaseModel
@@ -53,10 +53,10 @@ class OpenAPI(APIScaffold, Flask):
             info: Optional[Info] = None,
             security_schemes: Optional[SecuritySchemesDict] = None,
             responses: Optional[ResponseDict] = None,
-            servers: Optional[List[Server]] = None,
+            servers: Optional[list[Server]] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id_callback: Callable = get_operation_id_for_path,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             validation_error_status: Union[str, int] = 422,
             validation_error_model: Type[BaseModel] = ValidationErrorModel,
             validation_error_callback: Callable = make_validation_error_response,
@@ -110,13 +110,13 @@ class OpenAPI(APIScaffold, Flask):
         self.responses = convert_responses_key_to_string(responses or {})
 
         # Initialize instance variables
-        self.paths: Dict = dict()
-        self.components_schemas: Dict = dict()
+        self.paths: dict = dict()
+        self.components_schemas: dict = dict()
         self.components = Components()
 
         # Initialize lists for tags and tag names
-        self.tags: List[Tag] = []
-        self.tag_names: List[str] = []
+        self.tags: list[Tag] = []
+        self.tag_names: list[str] = []
 
         # Set URL prefixes and endpoints
         self.doc_prefix = doc_prefix
@@ -145,7 +145,7 @@ class OpenAPI(APIScaffold, Flask):
         self.cli.add_command(openapi_command)  # type: ignore
 
         # Initialize specification JSON
-        self.spec_json: Dict = {}
+        self.spec_json: dict = {}
 
     def _init_doc(self) -> None:
         """
@@ -204,7 +204,7 @@ class OpenAPI(APIScaffold, Flask):
         self.register_blueprint(blueprint)
 
     @property
-    def api_doc(self) -> Dict:
+    def api_doc(self) -> dict:
         """
         Generate the OpenAPI specification JSON.
 
@@ -299,7 +299,7 @@ class OpenAPI(APIScaffold, Flask):
         # Register the APIBlueprint with the current instance
         self.register_blueprint(api)
 
-    def register_api_view(self, api_view: APIView, view_kwargs: Optional[Dict[Any, Any]] = None) -> None:
+    def register_api_view(self, api_view: APIView, view_kwargs: Optional[dict[Any, Any]] = None) -> None:
         """
         Register APIView
 
@@ -343,16 +343,16 @@ class OpenAPI(APIScaffold, Flask):
             rule: str,
             func: Callable,
             *,
-            tags: Optional[List[Tag]] = None,
+            tags: Optional[list[Tag]] = None,
             summary: Optional[str] = None,
             description: Optional[str] = None,
             external_docs: Optional[ExternalDocumentation] = None,
             operation_id: Optional[str] = None,
             responses: Optional[ResponseDict] = None,
             deprecated: Optional[bool] = None,
-            security: Optional[List[Dict[str, List[Any]]]] = None,
-            servers: Optional[List[Server]] = None,
-            openapi_extensions: Optional[Dict[str, Any]] = None,
+            security: Optional[list[dict[str, list[Any]]]] = None,
+            servers: Optional[list[Server]] = None,
+            openapi_extensions: Optional[dict[str, Any]] = None,
             doc_ui: bool = True,
             method: str = HTTPMethod.GET
     ) -> ParametersTuple:

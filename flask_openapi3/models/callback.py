@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
 # @Time    : 2023/7/4 9:35
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from .path_item import PathItem
@@ -15,4 +15,4 @@ that describes a set of requests that may be initiated by the API provider and t
 The key value used to identify the path item object is an expression, evaluated at runtime,
 that identifies a URL to use for the callback operation.
 """
-Callback = Dict[str, PathItem]
+Callback = dict[str, PathItem]
