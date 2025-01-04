@@ -17,17 +17,15 @@ def test_responses_are_replicated_in_open_api(request):
         """Base description"""
         test: int
 
-        model_config = dict(
-            openapi_extra={
+    @test_app.get(
+        "/test",
+        responses={
+            "201": {
+                "model": BaseResponse,
                 "description": "Custom description",
                 "headers": {
                     "location": {
                         "description": "URL of the new resource",
-                        "schema": {"type": "string"}
-                    }
-                },
-                "content": {
-                    "text/plain": {
                         "schema": {"type": "string"}
                     }
                 },
@@ -37,9 +35,8 @@ def test_responses_are_replicated_in_open_api(request):
                     }
                 }
             }
-        )
-
-    @test_app.get("/test", responses={"201": BaseResponse})
+        }
+    )
     def endpoint_test():
         return b"", 201  # pragma: no cover
 
@@ -58,10 +55,6 @@ def test_responses_are_replicated_in_open_api(request):
                 # This content is coming from responses
                 "application/json": {
                     "schema": {"$ref": "#/components/schemas/BaseResponse"}
-                },
-                # While this one comes from responses
-                "text/plain": {
-                    "schema": {"type": "string"}
                 }
             },
             "links": {
@@ -561,13 +554,13 @@ def test_prefix_items(request):
     assert schema == {'$ref': '#/components/schemas/TupleModel'}
     components = test_app.api_doc["components"]["schemas"]
     assert components["TupleModel"] == {'properties': {'my_tuple': {'maxItems': 2,
-                             'minItems': 2,
-                             'prefixItems': [{'enum': ['a', 'b'],
-                                              'type': 'string'},
-                                             {'enum': ['c', 'd'],
-                                              'type': 'string'}],
-                             'title': 'My Tuple',
-                             'type': 'array'}},
- 'required': ['my_tuple'],
- 'title': 'TupleModel',
- 'type': 'object'}
+                                                                    'minItems': 2,
+                                                                    'prefixItems': [{'enum': ['a', 'b'],
+                                                                                     'type': 'string'},
+                                                                                    {'enum': ['c', 'd'],
+                                                                                     'type': 'string'}],
+                                                                    'title': 'My Tuple',
+                                                                    'type': 'array'}},
+                                        'required': ['my_tuple'],
+                                        'title': 'TupleModel',
+                                        'type': 'object'}

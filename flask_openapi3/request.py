@@ -3,12 +3,21 @@
 # @Time    : 2022/4/1 16:54
 import json
 from json import JSONDecodeError
-from typing import Any, Type, Optional, Dict
+
+from typing import Any, Type, Optional, Dict, get_origin, get_args, Union
+
+try:
+    from types import UnionType  # type: ignore
+except ImportError:
+    # python < 3.9
+    UnionType = type(Union)  # type: ignore
 
 from flask import request, current_app, abort
-from pydantic import ValidationError, BaseModel
+from pydantic import ValidationError, BaseModel, RootModel
 from pydantic.fields import FieldInfo
 from werkzeug.datastructures.structures import MultiDict
+
+from flask_openapi3.utils import is_application_json
 
 
 def _get_list_value(model: Type[BaseModel], args: MultiDict, model_field_key: str, model_field_value: FieldInfo):
@@ -138,12 +147,20 @@ def _validate_form(form: Type[BaseModel], func_kwargs: dict):
 
 
 def _validate_body(body: Type[BaseModel], func_kwargs: dict):
-    obj = request.get_json(silent=True)
-    if isinstance(obj, str):
-        body_model = body.model_validate_json(json_data=obj)
+    if is_application_json(request.mimetype):
+        if get_origin(body) == UnionType:
+            root_model_list = [model for model in get_args(body)]
+            Body = RootModel[Union[tuple(root_model_list)]]  # type: ignore
+        else:
+            Body = body  # type: ignore
+        obj = request.get_json(silent=True)
+        if isinstance(obj, str):
+            body_model = Body.model_validate_json(json_data=obj)
+        else:
+            body_model = Body.model_validate(obj=obj)
+        func_kwargs["body"] = body_model
     else:
-        body_model = body.model_validate(obj=obj)
-    func_kwargs["body"] = body_model
+        func_kwargs["body"] = request
 
 
 def _validate_request(
