@@ -12,9 +12,9 @@ from typing import get_type_hints, Dict, Type, Callable, List, Tuple, Optional, 
 
 try:
     from types import UnionType  # type: ignore
-except ImportError:
-    # python < 3.9
-    UnionType = type(Union)  # type: ignore
+except ImportError:  # pragma: no cover
+    # python < 3.10
+    UnionType = Union  # type: ignore
 
 from flask import make_response, current_app
 from flask.wrappers import Response as FlaskResponse
@@ -359,7 +359,7 @@ def parse_body(
         for name, value in definitions.items():
             components_schemas[name] = Schema(**value)
 
-    if get_origin(body) == UnionType:
+    if get_origin(body) in (Union, UnionType):
         for model in get_args(body):
             _parse_body(model)
     else:
@@ -441,7 +441,7 @@ def get_responses(
         elif isinstance(response_model, dict):
             response_model["description"] = response_model.get("description", HTTP_STATUS.get(key, ""))
             _responses[key] = Response(**response_model)
-        elif get_origin(response_model) == UnionType:
+        elif get_origin(response_model) in [UnionType, Union]:
             for model in get_args(response_model):
                 _parse_response(key, model)
         else:

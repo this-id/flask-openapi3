@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 # @Author  : llc
-# @Time    : 2024/12/27 15:30
+# @Time    : 2025/1/6 16:37
+from typing import Union
+
+import pytest
 from flask import Request
 from pydantic import BaseModel
 
 from flask_openapi3 import OpenAPI
 
 app = OpenAPI(__name__)
+app.config["TESTING"] = True
 
 
 class DogBody(BaseModel):
@@ -50,8 +54,8 @@ class ContentTypeModel(BaseModel):
     }
 
 
-@app.post("/a", responses={200: DogBody | CatBody | ContentTypeModel | BsonModel})
-def index_a(body: DogBody | CatBody | ContentTypeModel | BsonModel):
+@app.post("/a", responses={200: Union[DogBody, CatBody, ContentTypeModel, BsonModel]})
+def index_a(body: Union[DogBody, CatBody, ContentTypeModel, BsonModel]):
     """
     This may be confusing, if the content-type is application/json, the type of body will be auto parsed to
     DogBody or CatBody, otherwise it cannot be parsed to ContentTypeModel or BsonModel.
@@ -64,16 +68,47 @@ def index_a(body: DogBody | CatBody | ContentTypeModel | BsonModel):
             ...
         elif body.mimetype == "application/bson":
             # processing bson data
-            from bson import BSON
-
-            obj = BSON(body.data).decode()
-            new_body = body.model_validate(obj=obj)
-            print(new_body)
+            ...
     else:
         # DogBody or CatBody
         ...
     return {"hello": "world"}
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.post("/b", responses={200: Union[ContentTypeModel, BsonModel]})
+def index_b(body: Union[ContentTypeModel, BsonModel]):
+    """
+    This may be confusing, if the content-type is application/json, the type of body will be auto parsed to
+    DogBody or CatBody, otherwise it cannot be parsed to ContentTypeModel or BsonModel.
+    The body is equivalent to the request variable in Flask, and you can use body.data, body.text, etc ...
+    """
+    print(body)
+    if isinstance(body, Request):
+        if body.mimetype == "text/csv":
+            # processing csv data
+            ...
+        elif body.mimetype == "application/bson":
+            # processing bson data
+            ...
+    else:
+        # DogBody or CatBody
+        ...
+    return {"hello": "world"}
+
+
+@pytest.fixture
+def client():
+    client = app.test_client()
+
+    return client
+
+
+def test_openapi(client):
+    resp = client.get("/openapi/openapi.json")
+    assert resp.status_code == 200
+
+    resp = client.post("/a", json={"a": 1, "b": "2"})
+    assert resp.status_code == 200
+
+    resp = client.post("/a", data="a,b,c\n1,2,3", headers={"Content-Type": "text/csv"})
+    assert resp.status_code == 200
