@@ -103,6 +103,88 @@ def get_book(raw: BookRaw):
     return "ok"
 ```
 
+## Multiple content types in the request body
+
+```python
+from typing import Union
+
+from flask import Request
+from pydantic import BaseModel
+
+from flask_openapi3 import OpenAPI
+
+app = OpenAPI(__name__)
+
+
+class DogBody(BaseModel):
+    a: int = None
+    b: str = None
+
+    model_config = {
+        "openapi_extra": {
+            "content_type": "application/vnd.dog+json"
+        }
+    }
+
+
+class CatBody(BaseModel):
+    c: int = None
+    d: str = None
+
+    model_config = {
+        "openapi_extra": {
+            "content_type": "application/vnd.cat+json"
+        }
+    }
+
+
+class BsonModel(BaseModel):
+    e: int = None
+    f: str = None
+
+    model_config = {
+        "openapi_extra": {
+            "content_type": "application/bson"
+        }
+    }
+
+
+class ContentTypeModel(BaseModel):
+    model_config = {
+        "openapi_extra": {
+            "content_type": "text/csv"
+        }
+    }
+
+
+@app.post("/a", responses={200: DogBody | CatBody | ContentTypeModel | BsonModel})
+def index_a(body: DogBody | CatBody | ContentTypeModel | BsonModel):
+    """
+    multiple content types examples.
+
+    This may be confusing, if the content-type is application/json, the type of body will be auto parsed to
+    DogBody or CatBody, otherwise it cannot be parsed to ContentTypeModel or BsonModel.
+    The body is equivalent to the request variable in Flask, and you can use body.data, body.text, etc ...
+    """
+    print(body)
+    if isinstance(body, Request):
+        if body.mimetype == "text/csv":
+            # processing csv data
+            ...
+        elif body.mimetype == "application/bson":
+            # processing bson data
+            ...
+    else:
+        # DogBody or CatBody
+        ...
+    return {"hello": "world"}
+```
+
+The effect in swagger:
+
+![](../assets/Snipaste_2025-01-14_10-44-00.png)
+
+
 ## Request model
 
 First, you need to define a [pydantic](https://github.com/pydantic/pydantic) model:
@@ -125,7 +207,7 @@ class BookQuery(BaseModel):
     author: str = Field(None, description='Author', json_schema_extra={"deprecated": True})
 ```
 
-Magic:
+The effect in swagger:
 
 ![](../assets/Snipaste_2022-09-04_10-10-03.png)
 

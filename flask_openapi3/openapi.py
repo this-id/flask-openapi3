@@ -359,6 +359,8 @@ class OpenAPI(APIScaffold, Flask):
             security: Optional[List[Dict[str, List[Any]]]] = None,
             servers: Optional[List[Server]] = None,
             openapi_extensions: Optional[Dict[str, Any]] = None,
+            request_body_description: Optional[str] = None,
+            request_body_required: Optional[bool] = True,
             doc_ui: bool = True,
             method: str = HTTPMethod.GET
     ) -> ParametersTuple:
@@ -378,6 +380,8 @@ class OpenAPI(APIScaffold, Flask):
             security: A declaration of which security mechanisms can be used for this operation.
             servers: An alternative server array to service this operation.
             openapi_extensions: Allows extensions to the OpenAPI Schema.
+            request_body_description: A brief description of the request body.
+            request_body_required: Determines if the request body is required in the request.
             doc_ui: Declares this operation to be shown. Default to True.
             method: HTTP method for the operation. Defaults to GET.
         """
@@ -429,6 +433,11 @@ class OpenAPI(APIScaffold, Flask):
             parse_method(uri, method, self.paths, operation)
 
             # Parse parameters
-            return parse_parameters(func, components_schemas=self.components_schemas, operation=operation)
+            return parse_parameters(
+                func, components_schemas=self.components_schemas,
+                operation=operation,
+                request_body_description=request_body_description,
+                request_body_required=request_body_required
+            )
         else:
             return parse_parameters(func, doc_ui=False)

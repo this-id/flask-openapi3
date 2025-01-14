@@ -3,12 +3,21 @@
 # @Time    : 2022/4/1 16:54
 import json
 from json import JSONDecodeError
-from typing import Any, Type, Optional, Dict
+
+from typing import Any, Type, Optional, Dict, get_origin, get_args, Union
+
+try:
+    from types import UnionType  # type: ignore
+except ImportError:  # pragma: no cover
+    # python < 3.10
+    UnionType = type(Union)  # type: ignore
 
 from flask import request, current_app, abort
-from pydantic import ValidationError, BaseModel
+from pydantic import ValidationError, BaseModel, RootModel
 from pydantic.fields import FieldInfo
 from werkzeug.datastructures.structures import MultiDict
+
+from flask_openapi3.utils import is_application_json
 
 
 def _get_list_value(model: Type[BaseModel], args: MultiDict, model_field_key: str, model_field_value: FieldInfo):
@@ -42,10 +51,8 @@ def _get_value(model: Type[BaseModel], args: MultiDict, model_field_key: str, mo
 def _validate_header(header: Type[BaseModel], func_kwargs: dict):
     request_headers = dict(request.headers)
     header_dict = {}
-    model_properties = header.model_json_schema().get("properties", {})
     for model_field_key, model_field_value in header.model_fields.items():
         key_title = model_field_key.replace("_", "-").title()
-        model_field_schema = model_properties.get(model_field_value.alias or model_field_key)
         if model_field_value.alias and header.model_config.get("populate_by_name"):
             key = model_field_value.alias
             key_alias_title = model_field_value.alias.replace("_", "-").title()
@@ -56,11 +63,9 @@ def _validate_header(header: Type[BaseModel], func_kwargs: dict):
             value = request_headers.get(key_alias_title)
         else:
             key = model_field_key
-            value = request_headers[key_title]
+            value = request_headers.get(key_title)
         if value is not None:
             header_dict[key] = value
-        if model_field_schema.get("type") == "null":
-            header_dict[key] = value  # type:ignore
     # extra keys
     for key, value in request_headers.items():
         if key not in header_dict.keys():
@@ -138,12 +143,20 @@ def _validate_form(form: Type[BaseModel], func_kwargs: dict):
 
 
 def _validate_body(body: Type[BaseModel], func_kwargs: dict):
-    obj = request.get_json(silent=True)
-    if isinstance(obj, str):
-        body_model = body.model_validate_json(json_data=obj)
+    if is_application_json(request.mimetype):
+        if get_origin(body) in (Union, UnionType):
+            root_model_list = [model for model in get_args(body)]
+            Body = RootModel[Union[tuple(root_model_list)]]  # type: ignore
+        else:
+            Body = body  # type: ignore
+        obj = request.get_json(silent=True)
+        if isinstance(obj, str):
+            body_model = Body.model_validate_json(json_data=obj)
+        else:
+            body_model = Body.model_validate(obj=obj)
+        func_kwargs["body"] = body_model
     else:
-        body_model = body.model_validate(obj=obj)
-    func_kwargs["body"] = body_model
+        func_kwargs["body"] = request
 
 
 def _validate_request(

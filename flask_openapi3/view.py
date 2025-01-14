@@ -112,6 +112,8 @@ class APIView:
             security: Optional[List[Dict[str, List[Any]]]] = None,
             servers: Optional[List[Server]] = None,
             openapi_extensions: Optional[Dict[str, Any]] = None,
+            request_body_description: Optional[str] = None,
+            request_body_required: Optional[bool] = True,
             doc_ui: bool = True
     ) -> Callable:
         """
@@ -129,6 +131,8 @@ class APIView:
             security: A declaration of which security mechanisms can be used for this operation.
             servers: An alternative server array to service this operation.
             openapi_extensions: Allows extensions to the OpenAPI Schema.
+            request_body_description: A brief description of the request body.
+            request_body_required: Determines if the request body is required in the request.
             doc_ui: Declares this operation to be shown. Default to True.
         """
 
@@ -177,9 +181,10 @@ class APIView:
 
             # Parse parameters
             parse_parameters(
-                func,
-                components_schemas=self.components_schemas,
-                operation=operation
+                func, components_schemas=self.components_schemas,
+                operation=operation,
+                request_body_description=request_body_description,
+                request_body_required=request_body_required
             )
 
             # Parse response

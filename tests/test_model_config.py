@@ -44,7 +44,6 @@ class BookBody(BaseModel):
 
     model_config = dict(
         openapi_extra={
-            "description": "This is post RequestBody",
             "example": {"age": 12, "author": "author1"},
             "examples": {
                 "example1": {
@@ -99,7 +98,7 @@ def api_form(form: UploadFilesForm):
     print(form)  # pragma: no cover
 
 
-@app.post("/body", responses={"200": MessageResponse})
+@app.post("/body", request_body_description="This is post RequestBody", responses={"200": MessageResponse})
 def api_error_json(body: BookBody):
     print(body)  # pragma: no cover
 

@@ -7,7 +7,14 @@ import re
 import sys
 from enum import Enum
 from http import HTTPStatus
-from typing import get_type_hints, Dict, Type, Callable, List, Tuple, Optional, Any, DefaultDict
+from typing import Dict, Type, Callable, List, Tuple, Optional, Any, DefaultDict, Union
+from typing import get_args, get_origin, get_type_hints
+
+try:
+    from types import UnionType  # type: ignore
+except ImportError:  # pragma: no cover
+    # python < 3.10
+    UnionType = Union  # type: ignore
 
 from flask import make_response, current_app
 from flask.wrappers import Response as FlaskResponse
@@ -268,6 +275,11 @@ def parse_form(
 ) -> Tuple[Dict[str, MediaType], dict]:
     """Parses a form model and returns a list of parameters and component schemas."""
     schema = get_model_schema(form)
+
+    model_config: DefaultDict[str, Any] = form.model_config  # type: ignore
+    openapi_extra = model_config.get("openapi_extra", {})
+    content_type = openapi_extra.get("content_type", "multipart/form-data")
+
     components_schemas = dict()
     properties = schema.get("properties", {})
 
@@ -280,14 +292,22 @@ def parse_form(
     for k, v in properties.items():
         if v.get("type") == "array":
             encoding[k] = Encoding(style="form", explode=True)
-    content = {
-        "multipart/form-data": MediaType(
-            schema=Schema(**{"$ref": f"{OPENAPI3_REF_PREFIX}/{title}"}),
-        )
-    }
-    if encoding:
-        content["multipart/form-data"].encoding = encoding
 
+    media_type = MediaType(**{"schema": Schema(**{"$ref": f"{OPENAPI3_REF_PREFIX}/{title}"})})
+
+    if openapi_extra:
+        openapi_extra_keys = openapi_extra.keys()
+        if "example" in openapi_extra_keys:
+            media_type.example = openapi_extra.get("example")
+        if "examples" in openapi_extra_keys:
+            media_type.examples = openapi_extra.get("examples")
+        if "encoding" in openapi_extra_keys:
+            media_type.encoding = openapi_extra.get("encoding")
+
+    if encoding:
+        media_type.encoding = encoding
+
+    content = {content_type: media_type}
     # Parse definitions
     definitions = schema.get("$defs", {})
     for name, value in definitions.items():
@@ -300,22 +320,49 @@ def parse_body(
         body: Type[BaseModel],
 ) -> Tuple[Dict[str, MediaType], dict]:
     """Parses a body model and returns a list of parameters and component schemas."""
-    schema = get_model_schema(body)
-    components_schemas = dict()
 
-    original_title = schema.get("title") or body.__name__
-    title = normalize_name(original_title)
-    components_schemas[title] = Schema(**schema)
-    content = {
-        "application/json": MediaType(
-            schema=Schema(**{"$ref": f"{OPENAPI3_REF_PREFIX}/{title}"})
-        )
-    }
+    content = {}
+    components_schemas = {}
 
-    # Parse definitions
-    definitions = schema.get("$defs", {})
-    for name, value in definitions.items():
-        components_schemas[name] = Schema(**value)
+    def _parse_body(_model):
+        model_config: DefaultDict[str, Any] = _model.model_config  # type: ignore
+        openapi_extra = model_config.get("openapi_extra", {})
+        content_type = openapi_extra.get("content_type", "application/json")
+
+        if not is_application_json(content_type):
+            content_schema = openapi_extra.get("content_schema", {"type": DataType.STRING})
+            content[content_type] = MediaType(**{"schema": content_schema})
+            return
+
+        schema = get_model_schema(_model)
+
+        original_title = schema.get("title") or _model.__name__
+        title = normalize_name(original_title)
+        components_schemas[title] = Schema(**schema)
+
+        media_type = MediaType(**{"schema": Schema(**{"$ref": f"{OPENAPI3_REF_PREFIX}/{title}"})})
+
+        if openapi_extra:
+            openapi_extra_keys = openapi_extra.keys()
+            if "example" in openapi_extra_keys:
+                media_type.example = openapi_extra.get("example")
+            if "examples" in openapi_extra_keys:
+                media_type.examples = openapi_extra.get("examples")
+            if "encoding" in openapi_extra_keys:
+                media_type.encoding = openapi_extra.get("encoding")
+
+        content[content_type] = media_type
+
+        # Parse definitions
+        definitions = schema.get("$defs", {})
+        for name, value in definitions.items():
+            components_schemas[name] = Schema(**value)
+
+    if get_origin(body) in (Union, UnionType):
+        for model in get_args(body):
+            _parse_body(model)
+    else:
+        _parse_body(body)
 
     return content, components_schemas
 
@@ -325,54 +372,86 @@ def get_responses(
         components_schemas: dict,
         operation: Operation
 ) -> None:
-    _responses = {}
-    _schemas = {}
+    _responses: dict = {}
+    _schemas: dict = {}
+
+    def _parse_response(_key, _model):
+        model_config: DefaultDict[str, Any] = _model.model_config  # type: ignore
+        openapi_extra = model_config.get("openapi_extra", {})
+        content_type = openapi_extra.get("content_type", "application/json")
+
+        if not is_application_json(content_type):
+            content_schema = openapi_extra.get("content_schema", {"type": DataType.STRING})
+            media_type = MediaType(**{"schema": content_schema})
+            if _responses.get(_key):
+                _responses[_key].content[content_type] = media_type
+            else:
+                _responses[_key] = Response(
+                    description=HTTP_STATUS.get(_key, ""),
+                    content={content_type: media_type}
+                )
+            return
+
+        schema = get_model_schema(_model, mode="serialization")
+        # OpenAPI 3 support ^[a-zA-Z0-9\.\-_]+$ so we should normalize __name__
+        original_title = schema.get("title") or _model.__name__
+        name = normalize_name(original_title)
+
+        media_type = MediaType(**{"schema": Schema(**{"$ref": f"{OPENAPI3_REF_PREFIX}/{name}"})})
+
+        if openapi_extra:
+            openapi_extra_keys = openapi_extra.keys()
+            if "example" in openapi_extra_keys:
+                media_type.example = openapi_extra.get("example")
+            if "examples" in openapi_extra_keys:
+                media_type.examples = openapi_extra.get("examples")
+            if "encoding" in openapi_extra_keys:
+                media_type.encoding = openapi_extra.get("encoding")
+        if _responses.get(_key):
+            _responses[_key].content[content_type] = media_type
+        else:
+            _responses[_key] = Response(
+                description=HTTP_STATUS.get(_key, ""),
+                content={content_type: media_type}
+            )
+
+        _schemas[name] = Schema(**schema)
+        definitions = schema.get("$defs")
+        if definitions:
+            # Add schema definitions to _schemas
+            for name, value in definitions.items():
+                _schemas[normalize_name(name)] = Schema(**value)
 
     for key, response in responses.items():
-        if response is None:
+        if isinstance(response, dict) and "model" in response:
+            response_model = response.get("model")
+            response_description = response.get("description")
+            response_headers = response.get("headers")
+            response_links = response.get("links")
+        else:
+            response_model = response
+            response_description = None
+            response_headers = None
+            response_links = None
+
+        if response_model is None:
             # If the response is None, it means HTTP status code "204" (No Content)
             _responses[key] = Response(description=HTTP_STATUS.get(key, ""))
-        elif isinstance(response, dict):
-            response["description"] = response.get("description", HTTP_STATUS.get(key, ""))
-            _responses[key] = Response(**response)
+        elif isinstance(response_model, dict):
+            response_model["description"] = response_model.get("description", HTTP_STATUS.get(key, ""))
+            _responses[key] = Response(**response_model)
+        elif get_origin(response_model) in [UnionType, Union]:
+            for model in get_args(response_model):
+                _parse_response(key, model)
         else:
-            # OpenAPI 3 support ^[a-zA-Z0-9\.\-_]+$ so we should normalize __name__
-            schema = get_model_schema(response, mode="serialization")
-            original_title = schema.get("title") or response.__name__
-            name = normalize_name(original_title)
-            _responses[key] = Response(
-                description=HTTP_STATUS.get(key, ""),
-                content={
-                    "application/json": MediaType(
-                        schema=Schema(**{"$ref": f"{OPENAPI3_REF_PREFIX}/{name}"})
-                    )})
+            _parse_response(key, response_model)
 
-            model_config: DefaultDict[str, Any] = response.model_config  # type: ignore
-            openapi_extra = model_config.get("openapi_extra", {})
-            if openapi_extra:
-                openapi_extra_keys = openapi_extra.keys()
-                # Add additional information from model_config to the response
-                if "description" in openapi_extra_keys:
-                    _responses[key].description = openapi_extra.get("description")
-                if "headers" in openapi_extra_keys:
-                    _responses[key].headers = openapi_extra.get("headers")
-                if "links" in openapi_extra_keys:
-                    _responses[key].links = openapi_extra.get("links")
-                _content = _responses[key].content
-                if "example" in openapi_extra_keys:
-                    _content["application/json"].example = openapi_extra.get("example")  # type: ignore
-                if "examples" in openapi_extra_keys:
-                    _content["application/json"].examples = openapi_extra.get("examples")  # type: ignore
-                if "encoding" in openapi_extra_keys:
-                    _content["application/json"].encoding = openapi_extra.get("encoding")  # type: ignore
-                _content.update(openapi_extra.get("content", {}))  # type: ignore
-
-            _schemas[name] = Schema(**schema)
-            definitions = schema.get("$defs")
-            if definitions:
-                # Add schema definitions to _schemas
-                for name, value in definitions.items():
-                    _schemas[normalize_name(name)] = Schema(**value)
+        if response_description is not None:
+            _responses[key].description = response_description
+        if response_headers is not None:
+            _responses[key].headers = response_headers
+        if response_links is not None:
+            _responses[key].links = response_links
 
     components_schemas.update(**_schemas)
     operation.responses = _responses
@@ -413,6 +492,8 @@ def parse_parameters(
         *,
         components_schemas: Optional[Dict] = None,
         operation: Optional[Operation] = None,
+        request_body_description: Optional[str] = None,
+        request_body_required: Optional[bool] = True,
         doc_ui: bool = True,
 ) -> ParametersTuple:
     """
@@ -423,6 +504,8 @@ def parse_parameters(
         func: The function to parse the parameters from.
         components_schemas: Dictionary to store the parsed components schemas (default: None).
         operation: Operation object to populate with parsed parameters (default: None).
+        request_body_description: A brief description of the request body (default: None).
+        request_body_required: Determines if the request body is required in the request (default: True).
         doc_ui: Flag indicating whether to return types for documentation UI (default: True).
 
     Returns:
@@ -481,51 +564,31 @@ def parse_parameters(
         _content, _components_schemas = parse_form(form)
         components_schemas.update(**_components_schemas)
         request_body = RequestBody(content=_content, required=True)
-        model_config: DefaultDict[str, Any] = form.model_config  # type: ignore
-        openapi_extra = model_config.get("openapi_extra", {})
-        if openapi_extra:
-            openapi_extra_keys = openapi_extra.keys()
-            if "description" in openapi_extra_keys:
-                request_body.description = openapi_extra.get("description")
-            if "example" in openapi_extra_keys:
-                request_body.content["multipart/form-data"].example = openapi_extra.get("example")
-            if "examples" in openapi_extra_keys:
-                request_body.content["multipart/form-data"].examples = openapi_extra.get("examples")
-            if "encoding" in openapi_extra_keys:
-                request_body.content["multipart/form-data"].encoding = openapi_extra.get("encoding")
+        if request_body_description:
+            request_body.description = request_body_description
+        request_body.required = request_body_required
         operation.requestBody = request_body
 
     if body:
         _content, _components_schemas = parse_body(body)
         components_schemas.update(**_components_schemas)
         request_body = RequestBody(content=_content, required=True)
-        model_config: DefaultDict[str, Any] = body.model_config  # type: ignore
-        openapi_extra = model_config.get("openapi_extra", {})
-        if openapi_extra:
-            openapi_extra_keys = openapi_extra.keys()
-            if "description" in openapi_extra_keys:
-                request_body.description = openapi_extra.get("description")
-            request_body.required = openapi_extra.get("required", True)
-            if "example" in openapi_extra_keys:
-                request_body.content["application/json"].example = openapi_extra.get("example")
-            if "examples" in openapi_extra_keys:
-                request_body.content["application/json"].examples = openapi_extra.get("examples")
-            if "encoding" in openapi_extra_keys:
-                request_body.content["application/json"].encoding = openapi_extra.get("encoding")
+        if request_body_description:
+            request_body.description = request_body_description
+        request_body.required = request_body_required
         operation.requestBody = request_body
 
     if raw:
         _content = {}
         for mimetype in raw.mimetypes:
-            if mimetype.startswith("application/json"):
-                _content[mimetype] = MediaType(
-                    schema=Schema(type=DataType.OBJECT)
-                )
+            if is_application_json(mimetype):
+                _content[mimetype] = MediaType(**{"schema": Schema(type=DataType.OBJECT)})
             else:
-                _content[mimetype] = MediaType(
-                    schema=Schema(type=DataType.STRING)
-                )
+                _content[mimetype] = MediaType(**{"schema": Schema(type=DataType.STRING)})
         request_body = RequestBody(content=_content)
+        if request_body_description:
+            request_body.description = request_body_description
+        request_body.required = request_body_required
         operation.requestBody = request_body
 
     if parameters:
@@ -615,3 +678,7 @@ def convert_responses_key_to_string(responses: ResponseDict) -> ResponseStrKeyDi
 
 def normalize_name(name: str) -> str:
     return re.sub(r"[^\w.\-]", "_", name)
+
+
+def is_application_json(content_type: str) -> bool:
+    return "application" in content_type and "json" in content_type
