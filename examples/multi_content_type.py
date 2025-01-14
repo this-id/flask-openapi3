@@ -53,6 +53,8 @@ class ContentTypeModel(BaseModel):
 @app.post("/a", responses={200: DogBody | CatBody | ContentTypeModel | BsonModel})
 def index_a(body: DogBody | CatBody | ContentTypeModel | BsonModel):
     """
+    multiple content types examples.
+
     This may be confusing, if the content-type is application/json, the type of body will be auto parsed to
     DogBody or CatBody, otherwise it cannot be parsed to ContentTypeModel or BsonModel.
     The body is equivalent to the request variable in Flask, and you can use body.data, body.text, etc ...

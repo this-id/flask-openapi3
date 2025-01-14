@@ -7,8 +7,8 @@ import re
 import sys
 from enum import Enum
 from http import HTTPStatus
-
-from typing import get_type_hints, Dict, Type, Callable, List, Tuple, Optional, Any, DefaultDict, Union
+from typing import Dict, Type, Callable, List, Tuple, Optional, Any, DefaultDict, Union
+from typing import get_args, get_origin, get_type_hints
 
 try:
     from types import UnionType  # type: ignore
@@ -20,7 +20,6 @@ from flask import make_response, current_app
 from flask.wrappers import Response as FlaskResponse
 from pydantic import BaseModel, ValidationError
 from pydantic.json_schema import JsonSchemaMode
-from typing_extensions import get_args, get_origin
 
 from .models import Encoding
 from .models import MediaType

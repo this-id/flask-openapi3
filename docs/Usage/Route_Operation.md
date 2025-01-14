@@ -287,6 +287,29 @@ class BookListAPIView:
 app.register_api_view(api_view)
 ```
 
+## request_body_description
+
+A brief description of the request body.
+
+```python
+from flask_openapi3 import OpenAPI
+
+app = OpenAPI(__name__)
+
+@app.post(
+    "/",
+    request_body_description="A brief description of the request body."
+)
+def create_book(body: Bookbody):
+    ...
+```
+
+![](../assets/Snipaste_2025-01-14_10-56-40.png)
+
+## request_body_required
+
+Determines if the request body is required in the request.
+
 ## doc_ui
 
 You can pass `doc_ui=False` to disable the `OpenAPI spec` when init `OpenAPI `.
