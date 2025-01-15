@@ -280,12 +280,18 @@ class OpenAPI(APIScaffold, Flask):
                     }
                 }
 
-    def register_api(self, api: APIBlueprint) -> None:
+    def register_api(self, api: APIBlueprint, **options: Any) -> None:
         """
         Register an APIBlueprint.
 
         Args:
             api: The APIBlueprint instance to register.
+
+            options: Additional keyword arguments are passed to :class:`~flask.blueprints.BlueprintSetupState`.
+            They can be accessed in :meth:`~flask.Blueprint.record` callbacks.
+            url_prefix, Blueprint routes will be prefixed with this.
+            subdomain, Blueprint routes will match on this subdomain.
+            url_defaults, Blueprint routes will use these default values for view arguments.
 
         """
         for tag in api.tags:
@@ -297,20 +303,31 @@ class OpenAPI(APIScaffold, Flask):
                 self.tag_names.append(tag.name)
 
         # Update paths with the APIBlueprint's paths
+        url_prefix = options.get("url_prefix")
+        if url_prefix and api.url_prefix and url_prefix != api.url_prefix:
+            api.paths = {url_prefix + k.removeprefix(api.url_prefix): v for k, v in api.paths.items()}
+        elif url_prefix and not api.url_prefix:
+            api.paths = {url_prefix.rstrip("/") + "/" + k.lstrip("/"): v for k, v in api.paths.items()}
         self.paths.update(**api.paths)
 
         # Update component schemas with the APIBlueprint's component schemas
         self.components_schemas.update(**api.components_schemas)
 
         # Register the APIBlueprint with the current instance
-        self.register_blueprint(api)
+        self.register_blueprint(api, **options)
 
-    def register_api_view(self, api_view: APIView, view_kwargs: Optional[Dict[Any, Any]] = None) -> None:
+    def register_api_view(
+            self,
+            api_view: APIView,
+            url_prefix: Optional[str] = None,
+            view_kwargs: Optional[Dict[Any, Any]] = None
+    ) -> None:
         """
         Register APIView
 
         Args:
             api_view: The APIView instance to register.
+            url_prefix: A path to prepend to all the APIView's urls
             view_kwargs: Additional keyword arguments to pass to the API views.
         """
         if view_kwargs is None:
@@ -326,13 +343,17 @@ class OpenAPI(APIScaffold, Flask):
                 self.tag_names.append(tag.name)
 
         # Update paths with the APIView's paths
+        if url_prefix and api_view.url_prefix and url_prefix != api_view.url_prefix:
+            api_view.paths = {url_prefix + k.removeprefix(api_view.url_prefix): v for k, v in api_view.paths.items()}
+        elif url_prefix and not api_view.url_prefix:
+            api_view.paths = {url_prefix.rstrip("/") + "/" + k.lstrip("/"): v for k, v in api_view.paths.items()}
         self.paths.update(**api_view.paths)
 
         # Update component schemas with the APIView's component schemas
         self.components_schemas.update(**api_view.components_schemas)
 
         # Register the APIView with the current instance
-        api_view.register(self, view_kwargs=view_kwargs)
+        api_view.register(self, url_prefix=url_prefix, view_kwargs=view_kwargs)
 
     def _add_url_rule(
             self,

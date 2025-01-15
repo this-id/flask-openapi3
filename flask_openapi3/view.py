@@ -190,12 +190,18 @@ class APIView:
 
         return decorator
 
-    def register(self, app: "OpenAPI", view_kwargs: Optional[Dict[Any, Any]] = None) -> None:
+    def register(
+            self,
+            app: "OpenAPI",
+            url_prefix: Optional[str] = None,
+            view_kwargs: Optional[Dict[Any, Any]] = None
+    ) -> None:
         """
         Register the API views with the given OpenAPI app.
 
         Args:
             app: An instance of the OpenAPI app.
+            url_prefix: A path to prepend to all the APIView's urls
             view_kwargs: Additional keyword arguments to pass to the API views.
         """
         for rule, (cls, methods) in self.views.items():
@@ -214,6 +220,12 @@ class APIView:
                     view_class=cls,
                     view_kwargs=view_kwargs
                 )
+
+                if url_prefix and self.url_prefix and url_prefix != self.url_prefix:
+                    rule = url_prefix + rule.removeprefix(self.url_prefix)
+                elif url_prefix and not self.url_prefix:
+                    rule = url_prefix.rstrip("/") + "/" + rule.lstrip("/")
+
                 options = {
                     "endpoint": cls.__name__ + "." + method.lower(),
                     "methods": [method.upper()]
